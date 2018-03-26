@@ -58,7 +58,7 @@ public class ImageBinder {
 				byte[] dataByteArr = new byte[3072];
 				labelByte = (byte) fis.read();
 				fis.read(dataByteArr, 0, 3072);
-				allImages.add(new Image(labelByte, dataByteArr));
+				testImages.add(new Image(labelByte, dataByteArr));
 
 			}
 
