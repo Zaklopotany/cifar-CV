@@ -20,6 +20,11 @@
 			<version>1.0.0-alpha</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.knowm.xchart</groupId>
+			<artifactId>xchart</artifactId>
+			<version>3.5.1</version>
+		</dependency>
 
 
 
