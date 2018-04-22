@@ -55,7 +55,13 @@ public class NearestNeighbor {
 
 		@Override
 		public int compareTo(Neighbor o) {
-			return this.getCompareValue() > o.getCompareValue() ? 0 : 1;
+			if (this.getCompareValue() > o.getCompareValue()) {
+				return -1;
+			} else if (this.getCompareValue() < o.getCompareValue()) {
+				return 1;
+			} else {
+				return 0;
+			}
 		}
 		@Override
 		public String toString() {

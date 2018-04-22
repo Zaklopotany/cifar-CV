@@ -10,6 +10,7 @@ public class ImageBinder {
 	public static final String MAIN_PATH = "/home/zaklopotany/Pulpit/images";
 	public static List<Image> testImages = new ArrayList<>();
 	public static List<Image> allImages = new ArrayList<>();
+	private static FileInputStream fis;
 
 	public static List<Image> listOfAllImages() {
 
@@ -18,18 +19,19 @@ public class ImageBinder {
 		String path3 = "/data_batch_3.bin";
 		String path4 = "/data_batch_4.bin";
 		String path5 = "/data_batch_5.bin";
+		String[] paths = {path1,path2,path3,path4,path5};
 		File[] imageFiles = new File[5];
 		// load All files
 		for (int i = 0; i < imageFiles.length; i++) {
-			imageFiles[i] = new File(MAIN_PATH + path1);
+			imageFiles[i] = new File(MAIN_PATH + paths[i]);
 		}
 		// Create Images- bind data from binary files
 		for (File image : imageFiles) {
 			try {
-				FileInputStream fis = new FileInputStream(image);
+				fis = new FileInputStream(image);
 				for (int i = 0; i < 10000; i++) {
 					byte labelByte;
-					byte[] dataByteArr = new byte[3072];
+					byte[] dataByteArr = new byte[3072]; 
 					labelByte = (byte) fis.read();
 					fis.read(dataByteArr, 0, 3072);
 					allImages.add(new Image(labelByte, dataByteArr));
@@ -46,8 +48,8 @@ public class ImageBinder {
 
 	public static List<Image> listOfTestImages() {
 
-		String path1 = "/test_batch.bin";
-		File file = new File(MAIN_PATH + path1);
+		String test_path = "/test_batch.bin";
+		File file = new File(MAIN_PATH + test_path);
 
 		// Create Images- bind data from binary files
 
