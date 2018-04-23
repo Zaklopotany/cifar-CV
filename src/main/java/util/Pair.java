@@ -5,6 +5,13 @@ public class Pair <V,W> {
 	private V key;
 	private W value;
 	
+	
+	
+	public Pair(V key, W value) {
+		super();
+		this.key = key;
+		this.value = value;
+	}
 	public V getKey() {
 		return key;
 	}
