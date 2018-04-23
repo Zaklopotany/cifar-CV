@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
 import cifar.Image;
+import util.Pair;
 
 public class LinearClasifier {
 	private static final Random rand = new Random();
@@ -67,12 +67,11 @@ public class LinearClasifier {
 	}
 
 	// get random subset of data: subset size - imgNUm
-	public Map<INDArray, INDArray> getBatch(int size) throws Exception {
+	public Pair<INDArray, INDArray> getBatch(int size) throws Exception {
 		if (size <= 0) {
 			throw new Exception("Incorrect values");
 		}
 
-		Map<INDArray, INDArray> tempMap = new HashMap<>();
 		INDArray data = Nd4j.create(size, weights.columns() + 1);
 		INDArray label = Nd4j.create(size);
 
@@ -81,20 +80,21 @@ public class LinearClasifier {
 			data.put(i, Nd4j.create(LinearClasifier.convertToIntArray(tempImg.getImageData())));
 			label.putScalar(i, tempImg.getLabel());
 		}
-
-		tempMap.put(data, label);
+		Pair<INDArray,INDArray> tempPair = new Pair(data, label);
 		logger.info(" NEW BATCH ");
-		return tempMap;
+		return tempPair;
 	}
 
-	public INDArray calculateMarginSVM(INDArray batchData, INDArray weights) {
-
-		INDArray margin = Nd4j.create(classNum, batchData.rows());
-		INDArray scores = batchData.mul(weights);
-		INDArray correctScores = Nd4j.create(batchData.rows());
+	public INDArray calculateMarginSVM(Pair<INDArray, INDArray>  batchData, INDArray weights) {
 		
-		for(int i = 0; i<batchData.rows(); i++) {
-			
+//		INDArray margin = Nd4j.create(classNum, batchData.getKey().rows());
+		INDArray scores = batchData.getKey().mul(weights);
+		INDArray correctScores = Nd4j.create(batchData.getKey().rows());
+		
+		for(int i = 0; i<batchData.getKey().rows(); i++) {
+//			scores
+			batchData.getKey().getDouble(i, batchData.getValue().getInt(i));
+//			correctScores.put(i, b)
 		}
 
 		logger.info(" MARGIN CALCULATED");
