@@ -9,22 +9,32 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<nd4j.version>0.9.1</nd4j.version>
 	</properties>
+
 
 	<dependencies>
 
-		<!-- https://mvnrepository.com/artifact/org.nd4j/nd4j-native-platform -->
+
 		<dependency>
 			<groupId>org.nd4j</groupId>
 			<artifactId>nd4j-native-platform</artifactId>
-			<version>1.0.0-alpha</version>
-			<scope>test</scope>
+			<version>${nd4j.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.nd4j/nd4j-api -->
+		<dependency>
+			<groupId>org.nd4j</groupId>
+			<artifactId>nd4j-api</artifactId>
+			<version>${nd4j.version}</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.knowm.xchart</groupId>
 			<artifactId>xchart</artifactId>
 			<version>3.5.1</version>
 		</dependency>
+
 
 
 
