@@ -4,12 +4,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import cifar.Image;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
-
-import cifar.Image;
 import util.Pair;
 
 public class LinearClasifier {
@@ -17,6 +15,7 @@ public class LinearClasifier {
 	private List<Image> data;
 	private double step;
 	private INDArray weights;
+
 	private int classNum; // number of distinguish categories
 	private double delta; // to calculate margin
 	
@@ -109,7 +108,7 @@ public class LinearClasifier {
 
 		INDArray sumArray = margin.sum(0);
 
-		INDArray ind = new NDArray();
+		INDArray ind = Nd4j.create(123);//= new NDArray();
 		return ind;
 		// delete Syi margin
 

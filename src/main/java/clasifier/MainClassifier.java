@@ -17,8 +17,7 @@ public class MainClassifier {
 		
 		logger.info("images loaded, size  " + images.size());
 		
-		LinearClasifier linc; 
-				LinearClasifier.getClasifierWithBiasTrick(images, 0.00001, 10, 1);
+		LinearClasifier linc = LinearClasifier.getClasifierWithBiasTrick(images, 0.00001, 10, 1);
 		
 		
 		Thread.sleep(1000);
