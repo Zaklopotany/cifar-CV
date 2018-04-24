@@ -15,7 +15,7 @@ public class LinearClasifier {
 	private List<Image> data;
 	private double step;
 	private INDArray weights;
-
+	public static final Logger logger = Logger.getLogger(LinearClasifier.class.getName());
 	private int classNum; // number of distinguish categories
 	private double delta; // to calculate margin
 	
@@ -31,12 +31,9 @@ public class LinearClasifier {
 	public static LinearClasifier getClasifierWithBiasTrick(List<Image> data, double step, int classNum, double delta) {
 
 		LinearClasifier linearClass = new LinearClasifier(data, step, classNum, delta);
-		try {
+
 			linearClass.setInitialWeights(classNum, data.get(0).getImageData().length + 1, step);
-		} catch (Exception e) {
-			e.getMessage();
-			e.printStackTrace();
-		}
+
 		return linearClass;
 	}
 
@@ -51,15 +48,19 @@ public class LinearClasifier {
 	public INDArray getWeights() {
 		return weights;
 	}
+    public List<Image> getData() {
+        return this.data;
+    }
 
-	private INDArray setInitialWeights(int rows, int cols, double step) {
-		return Nd4j.rand(cols, rows).muli(step);
+	private void setInitialWeights(int rows, int cols, double step) {
+		this.weights =  Nd4j.randn(cols, rows).mul(step);
 	}
 
 	// support method to create INDArray from byte array
-	public static int[] convertToIntArray(byte[] input) {
-		int[] ret = new int[input.length];
-		for (int i = 0; i < input.length; i++) {
+    //and add one additional dimension bias trick
+	public static double[] convertToIntArray(byte[] input) {
+		double[] ret = new double[input.length + 1];
+		for (int i = 0; i < input.length - 1; i++) {
 			ret[i] = input[i] & 0xff; // Range 0 to 255, not -128 to 127
 		}
 		return ret;
@@ -71,32 +72,36 @@ public class LinearClasifier {
 			throw new Exception("Incorrect values");
 		}
 
-		INDArray data = Nd4j.create(size, weights.columns() + 1);
-		INDArray label = Nd4j.create(size);
+		INDArray data = Nd4j.create(size, getWeights().rows());
+		INDArray label = Nd4j.create(1,size);
 
 		for (int i = 0; i < size; i++) {
 			// get random image from data set
-			Image tempImg = this.data.get(rand.nextInt(this.data.size()));
-			data.put(i, Nd4j.create(LinearClasifier.convertToIntArray(tempImg.getImageData())));
-			label.putScalar(i, tempImg.getLabel());
+			Image tempImg = getData().get(rand.nextInt(getData().size()));
+			data.putRow(i, Nd4j.create(LinearClasifier.convertToIntArray(tempImg.getImageData())));
+            System.out.println(tempImg.getLabel()&0x09);
+            label.putScalar(0,i, tempImg.getLabel());
 		}
 		Pair<INDArray, INDArray> tempPair = new Pair(data, label);
-//		MainClassifier.logger.info(" NEW BATCH ");
+		logger.info(" NEW BATCH ");
 		return tempPair;
 	}
 
-	public INDArray calculateMarginSVM(Pair<INDArray, INDArray> batchData, INDArray weights) {
+	public INDArray calculateMarginSVM(Pair<INDArray, INDArray> batchData) {
 
-		INDArray correctScores = Nd4j.create(batchData.getKey().rows());
-		INDArray scores = batchData.getKey().mul(weights); // Sj - scores for each class
-//		MainClassifier.logger.info(" BATCH SCORES CALCULATED");
+		INDArray correctScores = Nd4j.create(1,batchData.getKey().rows());
+		INDArray scores = batchData.getKey().mmul(getWeights()); // Sj - scores for each class
+		logger.info(" BATCH SCORES CALCULATED");
 
-		for (int i = 0; i < batchData.getKey().rows(); i++) {
+		for (int i = 0; i < scores.rows(); i++) {
 			// Syi - correct scores
-			correctScores.put(i, 0, batchData.getKey().getDouble(i, batchData.getValue().getInt(i)));
+//            System.out.println(i);
+            correctScores.put(0,i,1);
+//            System.out.println(batchData.getValue().getInt(0,i));
+//			correctScores.put(0, i, batchData.getKey().getDouble(i, batchData.getValue().getInt(0,i)));
 		}
-//		MainClassifier.logger.info(" BATCH CORRECTSCORES CALCULATED");
-		// calculate margin and max(0,array)
+		logger.info(" BATCH CORRECTSCORES CALCULATED");
+//		 calculate margin and max(0,array)
 		INDArray margin = Transforms.max(scores.sub(correctScores).add(delta), 0);
 
 		// transform to binary array
@@ -107,8 +112,9 @@ public class LinearClasifier {
 		}
 
 		INDArray sumArray = margin.sum(0);
-
-		INDArray ind = Nd4j.create(123);//= new NDArray();
+		//delete
+		System.out.println(sumArray.toString());
+		INDArray ind = Nd4j.create(123,123);//= new NDArray();
 		return ind;
 		// delete Syi margin
 
