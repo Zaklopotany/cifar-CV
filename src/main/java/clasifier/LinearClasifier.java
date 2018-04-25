@@ -2,9 +2,9 @@ package clasifier;
 
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import cifar.Image;
+import org.apache.log4j.Logger;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -15,7 +15,9 @@ public class LinearClasifier {
     private List<Image> data;
     private double step;
     private INDArray weights;
-    public static final Logger logger = Logger.getLogger(LinearClasifier.class.getName());
+//    private static final Logger logger = Logger.getLogger(LinearClasifier.class.getName());
+//    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LinearClasifier.class);
+    private static final Logger logger = Logger.getLogger(LinearClasifier.class);
     private int classNum; // number of distinguish categories
     private double delta; // to calculate margin
 
@@ -88,25 +90,27 @@ public class LinearClasifier {
         INDArray correctScores = Nd4j.create(batchData.getKey().rows());
         INDArray scores = batchData.getKey().mmul(getWeights()); // Sj - scores for each class
         logger.info(" BATCH SCORES CALCULATED");
-
         for (int i = 0; i < scores.rows(); i++) {
             // Syi - correct scores
             correctScores.putScalar(i, batchData.getKey().getDouble(i, batchData.getValue().getInt(0, i)));
         }
         logger.info(" BATCH CORRECTSCORES CALCULATED");
         //calculate margin and max(0,array)
-        INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()), 0);
+        INDArray margin = scores.subColumnVector(correctScores.transpose());
+                margin = Transforms.max(margin, 0);
         // transform to binary array
         margin = margin.gt(0);
         //delete correct classes
         for (int i = 0; i < margin.rows(); i++) {
             margin.put(i, batchData.getValue().getInt(i), 0);
         }
-        //get number of incorrect scores gt than Sj - Syi + delta
+        //get number of incorrect scores gt than Sj - Syi + delta for explict class
         INDArray sumArray = margin.sum(1);
+        //merge binary a
+        for (int i = 0; i < margin.rows(); i++) {
+            margin.put(i, batchData.getValue().getInt(i), sumArray.getInt(i));
+        }
 
-        //delete
-        System.out.println(sumArray.toString());
         INDArray ind = Nd4j.create(123, 123);//= new NDArray();
         return ind;
         // delete Syi margin

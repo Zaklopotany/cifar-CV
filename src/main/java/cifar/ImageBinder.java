@@ -15,6 +15,8 @@ public class ImageBinder {
 
 	public static void initializeImageBinder(String imgFolderPath) {
 		MAIN_PATH = imgFolderPath;
+		testImages = new ArrayList<>();
+		allImages = new ArrayList<>();
 	}
 
 	//get list of 50 k images for training purpose
