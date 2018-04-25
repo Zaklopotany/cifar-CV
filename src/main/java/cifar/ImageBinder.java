@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageBinder {
-	public static final String MAIN_PATH = "C:\\Users\\mzukowski\\Desktop\\cifar-100-binary";
+	public static final String MAIN_PATH = "/home/zaklopotany/Pulpit/images";
 	public static List<Image> testImages = new ArrayList<>();
 	public static List<Image> allImages = new ArrayList<>();
 	private static FileInputStream fis;
