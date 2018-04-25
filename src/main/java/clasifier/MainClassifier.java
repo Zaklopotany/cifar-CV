@@ -14,6 +14,8 @@ public class MainClassifier {
 	
 	public static void main(String[] args) throws Exception {
 		logger.info("start");
+//		ImageBinder.initializeImageBinder("/home/zaklopotany/Pulpit/images"); - linux
+		ImageBinder.initializeImageBinder("C:\\Users\\mzukowski\\Desktop\\cifar10"); //- WIN 10 werk
 
 		List<Image> images = ImageBinder.listOfAllImages();
 		
@@ -22,7 +24,9 @@ public class MainClassifier {
 		LinearClasifier linc = LinearClasifier.getClasifierWithBiasTrick(images, 0.00001, 10, 1);
 
 		logger.info("LinearClassifier initialized");
+
 		linc.calculateMarginSVM(linc.getBatch(128));
+
 		Thread.sleep(1000);
 		
 	}

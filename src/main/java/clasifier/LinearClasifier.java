@@ -94,8 +94,8 @@ public class LinearClasifier {
             correctScores.putScalar(i, batchData.getKey().getDouble(i, batchData.getValue().getInt(0, i)));
         }
         logger.info(" BATCH CORRECTSCORES CALCULATED");
-//		 calculate margin and max(0,array)
-        INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()), 0.0);
+        //calculate margin and max(0,array)
+        INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()), 0);
         // transform to binary array
         margin = margin.gt(0);
         //delete correct classes

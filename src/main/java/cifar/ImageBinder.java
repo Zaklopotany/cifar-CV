@@ -7,12 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageBinder {
-	public static final String MAIN_PATH = "/home/zaklopotany/Pulpit/images";
-	public static List<Image> testImages = new ArrayList<>();
-	public static List<Image> allImages = new ArrayList<>();
+	private static String MAIN_PATH;// win10 work = "C:\\Users\\mzukowski\\Desktop\\cifar-100-binary"; // "/home/zaklopotany/Pulpit/images"
+	private static List<Image> testImages;// = new ArrayList<>();
+	private static List<Image> allImages;// = new ArrayList<>();
 	private static FileInputStream fis;
-	private static final int imgNum = 10000;
+	private static final int imgNum = 10000; //number of images per data batch in cifar 10 - 10000
 
+	public static void initializeImageBinder(String imgFolderPath) {
+		MAIN_PATH = imgFolderPath;
+	}
+
+	//get list of 50 k images for training purpose
 	public static List<Image> listOfAllImages() {
 		String path1 = "/data_batch_1.bin";
 		String path2 = "/data_batch_2.bin";
@@ -32,7 +37,7 @@ public class ImageBinder {
 				fis = new FileInputStream(image);
 				for (int i = 0; i < imgNum; i++) {
 					byte labelByte;
-					byte[] dataByteArr = new byte[3072]; 
+					byte[] dataByteArr = new byte[3072];
 					labelByte =  (byte) fis.read();
 					fis.read(dataByteArr, 0, 3072);
 					allImages.add(new Image(labelByte, dataByteArr));
@@ -53,16 +58,14 @@ public class ImageBinder {
 		File file = new File(MAIN_PATH + test_path);
 
 		// Create Images- bind data from binary files
-
 		try {
-			FileInputStream fis = new FileInputStream(file);
-			for (int i = 0; i < 10000; i++) {
+			fis = new FileInputStream(file);
+			for (int i = 0; i < imgNum; i++) {
 				byte labelByte;
 				byte[] dataByteArr = new byte[3072];
 				labelByte = (byte) fis.read();
 				fis.read(dataByteArr, 0, 3072);
 				testImages.add(new Image(labelByte, dataByteArr));
-
 			}
 
 		} catch (FileNotFoundException e) {
@@ -74,4 +77,11 @@ public class ImageBinder {
 		return testImages;
 	}
 
+	public static List<Image> getTestImages() {
+		return testImages;
+	}
+
+	public static List<Image> getAllImages() {
+		return allImages;
+	}
 }
