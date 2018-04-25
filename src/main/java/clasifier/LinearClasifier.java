@@ -60,7 +60,7 @@ public class LinearClasifier {
 
     // support method to create INDArray from byte array
     //and add one additional dimension bias trick
-    public static double[] convertToIntArray(byte[] input) {
+    public static double[] convertToDoubleArray(byte[] input) {
         double[] ret = new double[input.length + 1];
         for (int i = 0; i < input.length - 1; i++) {
             ret[i] = input[i] & 0xff; // Range 0 to 255, not -128 to 127
@@ -70,7 +70,7 @@ public class LinearClasifier {
 
     // get random subset of data: subset size - imgNUm
     public Pair getBatch(int size) throws Exception {
-        if (size <= 0) {
+        if (size <= 0 && size > 256) {
             throw new Exception("Incorrect values");
         }
         INDArray data = Nd4j.create(size, getWeights().rows());
@@ -79,14 +79,14 @@ public class LinearClasifier {
         for (int i = 0; i < size; i++) {
             // get random image from data set
             Image tempImg = getData().get(rand.nextInt(getData().size()));
-            data.putRow(i, Nd4j.create(LinearClasifier.convertToIntArray(tempImg.getImageData())));
+            data.putRow(i, Nd4j.create(LinearClasifier.convertToDoubleArray(tempImg.getImageData())));
             label.putScalar(0, i, tempImg.getLabel());
         }
         logger.info(" NEW BATCH CREATE");
-        return new Pair(data, label);
+        return new Pair<>(data, label);
     }
 
-    public INDArray calculateMarginSVM(Pair<INDArray, INDArray> batchData) {
+    public INDArray calculateGradient(Pair<INDArray, INDArray> batchData) {
         INDArray correctScores = Nd4j.create(batchData.getKey().rows());
         INDArray scores = batchData.getKey().mmul(getWeights()); // Sj - scores for each class
         logger.info(" BATCH SCORES CALCULATED");
@@ -94,10 +94,8 @@ public class LinearClasifier {
             // Syi - correct scores
             correctScores.putScalar(i, batchData.getKey().getDouble(i, batchData.getValue().getInt(0, i)));
         }
-        logger.info(" BATCH CORRECTSCORES CALCULATED");
         //calculate margin and max(0,array)
-        INDArray margin = scores.subColumnVector(correctScores.transpose());
-                margin = Transforms.max(margin, 0);
+        INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()),0);
         // transform to binary array
         margin = margin.gt(0);
         //delete correct classes
@@ -106,26 +104,22 @@ public class LinearClasifier {
         }
         //get number of incorrect scores gt than Sj - Syi + delta for explict class
         INDArray sumArray = margin.sum(1);
-        //merge binary a
+        //merge binary array with sum of incorrect classes
         for (int i = 0; i < margin.rows(); i++) {
-            margin.put(i, batchData.getValue().getInt(i), sumArray.getInt(i));
+            margin.put(i, batchData.getValue().getInt(i), -sumArray.getInt(i));
         }
+        logger.info("MARGINS CALCULATED");
+        //calculate and return gradient
+        return margin.transpose().mmul(batchData.getKey());
 
-        INDArray ind = Nd4j.create(123, 123);//= new NDArray();
-        return ind;
-        // delete Syi margin
-
-        // Wxi
-        // Wyi
-
-        //
-
-        // Transforms.max
     }
 
-    // batch
-    // calculate margins
-    // calculate binarry array
-    // calculate gradient
+    private void calculateLoss() {
+        logger.info("New Loss: ");
+    }
 
+    //calculate new wieghts
+    public void updateWeights() {
+
+    }
 }
