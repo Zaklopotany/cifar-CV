@@ -21,11 +21,11 @@ public class MainClassifier {
 		
 		logger.info("images loaded, size  " + images.size());
 
-		LinearClasifier linc = LinearClasifier.getClasifierWithBiasTrick(images, 0.00001, 10, 1);
+		LinearClasifier linc = LinearClasifier.getClasifierWithBiasTrick(images, 0.0001, 10, 1,0.00000001);
 
 		logger.info("LinearClassifier initialized");
 
-		linc.calculateMarginSVM(linc.getBatch(128));
+		linc.calculateNewParams(10000,256);
 
 		Thread.sleep(1000);
 		
