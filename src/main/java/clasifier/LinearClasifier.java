@@ -80,7 +80,6 @@ public class LinearClasifier {
 
         for (int i = 0; i < size; i++) {
             // get random image from data set
-//
             Image tempImg = getData().get(rand.nextInt(getData().size()));
             data.putRow(i, Nd4j.create(LinearClasifier.convertToDoubleArray(tempImg.getImageData())));
             label.putScalar(0, i, tempImg.getLabel());
@@ -97,14 +96,17 @@ public class LinearClasifier {
             // Syi - correct scores
             correctScores.putScalar(i, scores.getDouble(i, batchData.getValue().getInt(0, i)));
         }
+//        calculatePercentAcc(scores,batchData.getValue());
         //calculate margin and max(0,array)
         INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()).add(delta), 0);
+
+
         //delete correct classes
         for (int i = 0; i < margin.rows(); i++) {
             margin.put(i, batchData.getValue().getInt(i), 0);
         }
         //calculate loss with regularization
-        calculateLoss(margin, batchData.getKey().rows());
+//        calculateLoss(margin, batchData.getKey().rows());
         // transform to binary array
         margin = margin.gt(0);
         //get number of incorrect scores gt than Sj - Syi + delta for explict class
@@ -113,12 +115,17 @@ public class LinearClasifier {
         for (int i = 0; i < margin.rows(); i++) {
             margin.put(i, batchData.getValue().getInt(i), -sumArray.getDouble(i));
         }
-//        logger.info("MARGINS CALCULATED");
         //calculate and return gradient
         return margin.transpose().mmul(batchData.getKey()).div(batchData.getKey().rows());
 
     }
+    //calculate pwrvent acc
+    private void calculatePercentAcc(INDArray margin,INDArray batchLabels) {
+        INDArray correctValue = margin.argMax(1);
+        double mean = correctValue.eq(batchLabels).meanNumber().doubleValue();
+        logger.info("Percent accuracy per Batch : " + mean);
 
+    }
     //calculate Loss
     private void calculateLoss(INDArray margin, int batchSize) {
         double loss = margin.sumNumber().doubleValue() / batchSize + Transforms.pow(getWeights(), 2).sumNumber().doubleValue() * reg;
@@ -130,10 +137,10 @@ public class LinearClasifier {
         this.weights = getWeights().add(gradient.mul(-learningRate).transpose());
     }
 
-    //compute everything
-    public void calculateNewParams(int loop, int batchSize) throws Exception {
+    //find W matrix
+    public void trainLinearClasifier(int loop, int batchSize) throws Exception {
         for (int i = 0; i < loop; i++) {
-            logger.info("Loop no: " + i);
+            logger.info("Training classifier, loop no: " + i);
             updateWeights(calculateGradient(getBatch(batchSize)));
         }
     }
