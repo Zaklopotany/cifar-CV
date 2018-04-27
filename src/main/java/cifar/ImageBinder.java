@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ImageBinder implements ImgBinder<Image>{
+public class ImageBinder implements ImgBinder<ImageGeneric>{
 	private static String MAIN_PATH;// win10 work = "C:\\Users\\mzukowski\\Desktop\\cifar-100-binary"; // "/home/zaklopotany/Pulpit/images"
-	private static List<Image> testImages;// = new ArrayList<>();
-	private static List<Image> allImages;// = new ArrayList<>();
+	private static List<ImageGeneric> testImages;// = new ArrayList<>();
+	private static List<ImageGeneric> allImages;// = new ArrayList<>();
 	private static FileInputStream fis;
 	private static final int imgNum = 10000; //number of images per data batch in cifar 10 - 10000
 	private static final Logger logger = Logger.getLogger(ImageBinder.class);
@@ -30,7 +30,7 @@ public class ImageBinder implements ImgBinder<Image>{
 
 	//get list of 50 k images for training purpose
     @Override
-	public List<Image> listOfAllImages() {
+	public List<ImageGeneric> listOfAllImages() {
 		String path1 = "/data_batch_1.bin";
 		String path2 = "/data_batch_2.bin";
 		String path3 = "/data_batch_3.bin";
@@ -65,7 +65,7 @@ public class ImageBinder implements ImgBinder<Image>{
 		return allImages;
 	}
     @Override
-	public List<Image> listOfTestImages() {
+	public List<ImageGeneric> listOfTestImages() {
 
 		String test_path = "/test_batch.bin";
 		File file = new File(MAIN_PATH + test_path);

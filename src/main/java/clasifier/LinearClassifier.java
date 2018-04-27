@@ -3,6 +3,7 @@ package clasifier;
 import java.util.List;
 import java.util.Random;
 
+import cifar.CifarImage;
 import cifar.Image;
 import org.apache.log4j.Logger;
 import org.nd4j.linalg.api.buffer.DataBuffer;
@@ -12,7 +13,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import util.Pair;
 
 public class LinearClassifier {
-    private final List<Image> data;
+    private final List<ImageGeneric> data;
     private double step;
     private double learningRate;
     private INDArray weights;
@@ -24,7 +25,7 @@ public class LinearClassifier {
     private static final Logger logger = Logger.getLogger(LinearClassifier.class);
 
 
-    private LinearClassifier(List<Image> data, double step, int classNum, double delta, double learningRate) {
+    private LinearClassifier(List<ImageGeneric> data, double step, int classNum, double delta, double learningRate) {
         super();
         this.classNum = classNum;
         this.step = step;
@@ -34,10 +35,11 @@ public class LinearClassifier {
     }
 
     // numClass - number of distinguish image categories
-    public static LinearClassifier getClasifierWithBiasTrick(List<Image> data, double step, int classNum, double delta, double learningRate) {
+    public static LinearClassifier getClasifierWithBiasTrick(List<ImageGeneric> data, double step, int classNum
+            , double delta, double learningRate) {
 
         LinearClassifier linearClass = new LinearClassifier(data, step, classNum, delta, learningRate);
-        linearClass.setInitialWeights(classNum, data.get(0).getImageData().length + 1, step);
+        linearClass.setInitialWeights(classNum, data.get(0).getDataLength() + 1, step);
         logger.info("LinearClassifier initialized");
         return linearClass;
     }
@@ -53,22 +55,12 @@ public class LinearClassifier {
         return weights;
     }
 
-    public List<Image> getData() {
-        return this.data;
+    public List<ImageGeneric> getData() {
+        return data;
     }
 
     private void setInitialWeights(int rows, int cols, double step) {
         this.weights = Nd4j.randn(cols, rows).mul(step);
-    }
-
-    // support method to create INDArray from byte array
-    //and add one additional dimension bias trick
-    public static double[] convertToDoubleArray(byte[] input) {
-        double[] ret = new double[input.length + 1];
-        for (int i = 0; i < input.length - 1; i++) {
-            ret[i] = input[i] & 0xff; // Range 0 to 255, not -128 to 127
-        }
-        return ret;
     }
 
     // get random subset of data: subset size - imgNUm
@@ -81,7 +73,7 @@ public class LinearClassifier {
 
         for (int i = 0; i < size; i++) {
             // get random image from data set
-            Image tempImg = getData().get(rand.nextInt(getData().size()));
+            ImageGeneric tempImg = getData().get(rand.nextInt(getData().size()));
             data.putRow(i, tempImg.getImgDataNd4jMatrix());
             label.putScalar(0, i, tempImg.getLabel());
         }
@@ -120,13 +112,15 @@ public class LinearClassifier {
         return margin.transpose().mmul(batchData.getKey()).div(batchData.getKey().rows());
 
     }
+
     //calculate pwrvent acc
-    private void calculatePercentAcc(INDArray margin,INDArray batchLabels) {
+    private void calculatePercentAcc(INDArray margin, INDArray batchLabels) {
         INDArray correctValue = margin.argMax(1);
         double mean = correctValue.eq(batchLabels).meanNumber().doubleValue();
         logger.info("Percent accuracy per Batch : " + mean);
 
     }
+
     //calculate Loss
     private void calculateLoss(INDArray margin, int batchSize) {
         double loss = margin.sumNumber().doubleValue() / batchSize + Transforms.pow(getWeights(), 2).sumNumber().doubleValue() * reg;

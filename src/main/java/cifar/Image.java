@@ -5,38 +5,33 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import util.Util;
 
-public class Image implements ImageGeneric{
-	private byte label;
-	private byte[] imageData;
+public class Image implements ImageGeneric {
+    private byte label;
+    private byte[] data;
 
-	public Image() {
-	}
+    public Image() {
+    }
 
-	public Image(byte label, byte[] imageData) {
-		super();
-		this.label = label;
-		this.imageData = imageData;
-	}
+    public Image(byte label, byte[] data) {
+        super();
+        this.label = label;
+        this.data = data;
+    }
 
-	// getters setters
-	public byte getLabel() {
-		return label;
-	}
+    @Override
+    public byte getLabel() {
+        return label;
+    }
 
-	public void setLabel(byte label) {
-		this.label = label;
-	}
 
-	public byte[] getImageData() {
-		return imageData;
-	}
+    public INDArray getImgDataNd4jMatrix() {
+        return Nd4j.create(Util.convertToDoubleArrayBiasTrick(data));
+    }
 
-	public INDArray getImgDataNd4jMatrix() {
-		return Nd4j.create(Util.convertToDoubleArrayBiasTrick(getImageData()));
-	}
+    @Override
+    public int getDataLength() {
+        return this.data.length;
+    }
 
-	public void setImageData(byte[] imageData) {
-		this.imageData = imageData;
-	}
 
 }

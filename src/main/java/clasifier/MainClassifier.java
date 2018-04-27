@@ -15,7 +15,7 @@ public class MainClassifier {
 	public static void main(String[] args) throws Exception {
 //		ImageBinder.initializeImageBinder("/home/zaklopotany/Pulpit/images"); - linux
 		ImageBinder imgBin = new ImageBinder("C:\\Users\\mzukowski\\Desktop\\cifar10");
-		List<Image> images = imgBin.listOfAllImages();
+		List<ImageGeneric> images = imgBin.listOfAllImages();
 
 //		ImageBinder.initializeImageBinder("C:\\Users\\mzukowski\\Desktop\\cifar10"); //- WIN 10 werk
 //		List<Image> images = ImageBinder.listOfAllImages();
