@@ -1,26 +1,36 @@
 package cifar;
 
+import clasifier.ImageGeneric;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageBinder {
+
+public class ImageBinder implements ImgBinder<Image>{
 	private static String MAIN_PATH;// win10 work = "C:\\Users\\mzukowski\\Desktop\\cifar-100-binary"; // "/home/zaklopotany/Pulpit/images"
 	private static List<Image> testImages;// = new ArrayList<>();
 	private static List<Image> allImages;// = new ArrayList<>();
 	private static FileInputStream fis;
 	private static final int imgNum = 10000; //number of images per data batch in cifar 10 - 10000
+	private static final Logger logger = Logger.getLogger(ImageBinder.class);
 
-	public static void initializeImageBinder(String imgFolderPath) {
-		MAIN_PATH = imgFolderPath;
-		testImages = new ArrayList<>();
-		allImages = new ArrayList<>();
-	}
+
+    public ImageBinder(String imgFolderPath) {
+        super();
+        MAIN_PATH = imgFolderPath;
+        testImages = new ArrayList<>();
+        allImages = new ArrayList<>();
+        logger.info("Image binder Initialized...");
+
+    }
 
 	//get list of 50 k images for training purpose
-	public static List<Image> listOfAllImages() {
+    @Override
+	public List<Image> listOfAllImages() {
 		String path1 = "/data_batch_1.bin";
 		String path2 = "/data_batch_2.bin";
 		String path3 = "/data_batch_3.bin";
@@ -50,11 +60,12 @@ public class ImageBinder {
 				ee.printStackTrace();
 			}
 		}
+		logger.info("images loaded, size  " + allImages.size());
 
 		return allImages;
 	}
-
-	public static List<Image> listOfTestImages() {
+    @Override
+	public List<Image> listOfTestImages() {
 
 		String test_path = "/test_batch.bin";
 		File file = new File(MAIN_PATH + test_path);
@@ -76,14 +87,7 @@ public class ImageBinder {
 			ee.printStackTrace();
 		}
 
+		logger.info("Test images loaded, size  " + testImages.size());
 		return testImages;
-	}
-
-	public static List<Image> getTestImages() {
-		return testImages;
-	}
-
-	public static List<Image> getAllImages() {
-		return allImages;
 	}
 }

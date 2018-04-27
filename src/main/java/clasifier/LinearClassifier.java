@@ -5,12 +5,13 @@ import java.util.Random;
 
 import cifar.Image;
 import org.apache.log4j.Logger;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import util.Pair;
 
-public class LinearClasifier {
+public class LinearClassifier {
     private final List<Image> data;
     private double step;
     private double learningRate;
@@ -20,10 +21,10 @@ public class LinearClasifier {
     private double reg = 50000; //reularization hyperparameter
 
     private static final Random rand = new Random();
-    private static final Logger logger = Logger.getLogger(LinearClasifier.class);
+    private static final Logger logger = Logger.getLogger(LinearClassifier.class);
 
 
-    private LinearClasifier(List<Image> data, double step, int classNum, double delta, double learningRate) {
+    private LinearClassifier(List<Image> data, double step, int classNum, double delta, double learningRate) {
         super();
         this.classNum = classNum;
         this.step = step;
@@ -33,11 +34,11 @@ public class LinearClasifier {
     }
 
     // numClass - number of distinguish image categories
-    public static LinearClasifier getClasifierWithBiasTrick(List<Image> data, double step, int classNum, double delta, double learningRate) {
+    public static LinearClassifier getClasifierWithBiasTrick(List<Image> data, double step, int classNum, double delta, double learningRate) {
 
-        LinearClasifier linearClass = new LinearClasifier(data, step, classNum, delta, learningRate);
+        LinearClassifier linearClass = new LinearClassifier(data, step, classNum, delta, learningRate);
         linearClass.setInitialWeights(classNum, data.get(0).getImageData().length + 1, step);
-
+        logger.info("LinearClassifier initialized");
         return linearClass;
     }
 
@@ -81,7 +82,7 @@ public class LinearClasifier {
         for (int i = 0; i < size; i++) {
             // get random image from data set
             Image tempImg = getData().get(rand.nextInt(getData().size()));
-            data.putRow(i, Nd4j.create(LinearClasifier.convertToDoubleArray(tempImg.getImageData())));
+            data.putRow(i, tempImg.getImgDataNd4jMatrix());
             label.putScalar(0, i, tempImg.getLabel());
         }
 //        logger.info(" NEW BATCH CREATE");
