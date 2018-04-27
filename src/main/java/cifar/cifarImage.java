@@ -12,17 +12,23 @@ public class CifarImage implements ImageGeneric {
     INDArray data;
     byte label;
 
-    // getters setters
-    public byte getLabel() {
-        return label;
-    }
-
-    public void setLabel(byte label) {
+    public CifarImage(INDArray data, byte label) {
+        this.data = data;
         this.label = label;
     }
+
 
     @Override
     public INDArray getImgDataNd4jMatrix() {
         return data;
+    }
+
+    @Override
+    public int getDataLength() {
+        return this.data.length();
+    }
+    @Override
+    public byte getLabel() {
+        return label;
     }
 }

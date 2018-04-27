@@ -65,7 +65,7 @@ public class LinearClassifier {
 
     // get random subset of data: subset size - imgNUm
     private Pair getBatch(int size) throws Exception {
-        if (size <= 0 && size > 256) {
+        if (size <= 0 && size > getData().size()) {
             throw new Exception("Incorrect values");
         }
         INDArray data = Nd4j.create(size, getWeights().rows());
@@ -81,6 +81,18 @@ public class LinearClassifier {
         return new Pair<>(data, label);
     }
 
+    private Pair<INDArray, INDArray> getTestData(List<CifarImage> testData) {
+
+        INDArray data = Nd4j.create(testData.size(), getWeights().columns());
+        INDArray label = Nd4j.create(1, testData.size());
+
+        for (int i = 0; i < testData.size(); i++) {
+            data.putRow(i,testData.get(i).getImgDataNd4jMatrix());
+            label.putScalar(i, testData.get(i).getLabel());
+        }
+        return new Pair<>(data,label);
+    }
+
     private INDArray calculateGradient(Pair<INDArray, INDArray> batchData) {
         INDArray correctScores = Nd4j.create(batchData.getKey().rows());
         INDArray scores = batchData.getKey().mmul(getWeights()); // Sj - scores for each class
@@ -89,7 +101,7 @@ public class LinearClassifier {
             // Syi - correct scores
             correctScores.putScalar(i, scores.getDouble(i, batchData.getValue().getInt(0, i)));
         }
-//        calculatePercentAcc(scores,batchData.getValue());
+        calculatePercentAcc(scores, batchData.getValue());
         //calculate margin and max(0,array)
         INDArray margin = Transforms.max(scores.subColumnVector(correctScores.transpose()).add(delta), 0);
 
@@ -113,11 +125,11 @@ public class LinearClassifier {
 
     }
 
-    //calculate pwrvent acc
+    //calculate percent accuracy
     private void calculatePercentAcc(INDArray margin, INDArray batchLabels) {
         INDArray correctValue = margin.argMax(1);
         double mean = correctValue.eq(batchLabels).meanNumber().doubleValue();
-        logger.info("Percent accuracy per Batch : " + mean);
+        logger.info("Percent accuracy per dataSet: " + mean);
 
     }
 
@@ -138,5 +150,19 @@ public class LinearClassifier {
             logger.info("Training classifier, loop no: " + i);
             updateWeights(calculateGradient(getBatch(batchSize)));
         }
+    }
+
+    public void testTrainedClassifier(List<CifarImage> testData) {
+        Pair<INDArray, INDArray> testDataPair = getTestData(testData);
+
+        INDArray correctScores = Nd4j.create(testDataPair.getKey().rows());
+        INDArray scores = testDataPair.getKey().mmul(getWeights()); // Sj - scores for each class
+        for (int i = 0; i < scores.rows(); i++) {
+            // Syi - correct scores
+            correctScores.putScalar(i, scores.getDouble(i, testDataPair.getValue().getInt(0, i)));
+        }
+
+        calculatePercentAcc(scores, testDataPair.getValue());
+
     }
 }
