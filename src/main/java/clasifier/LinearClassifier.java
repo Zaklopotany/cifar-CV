@@ -39,7 +39,7 @@ public class LinearClassifier {
             , double delta, double learningRate) {
 
         LinearClassifier linearClass = new LinearClassifier(data, step, classNum, delta, learningRate);
-        linearClass.setInitialWeights(classNum, data.get(0).getDataLength() + 1, step);
+        linearClass.setInitialWeights(classNum, data.get(0).getDataLength(), step);
         logger.info("LinearClassifier initialized");
         return linearClass;
     }
@@ -81,9 +81,9 @@ public class LinearClassifier {
         return new Pair<>(data, label);
     }
 
-    private Pair<INDArray, INDArray> getTestData(List<CifarImage> testData) {
+    private Pair<INDArray, INDArray> getTestData(List<ImageGeneric> testData) {
 
-        INDArray data = Nd4j.create(testData.size(), getWeights().columns());
+        INDArray data = Nd4j.create(testData.size(), getWeights().rows());
         INDArray label = Nd4j.create(1, testData.size());
 
         for (int i = 0; i < testData.size(); i++) {
@@ -152,16 +152,9 @@ public class LinearClassifier {
         }
     }
 
-    public void testTrainedClassifier(List<CifarImage> testData) {
+    public void testTrainedClassifier(List<ImageGeneric> testData) {
         Pair<INDArray, INDArray> testDataPair = getTestData(testData);
-
-        INDArray correctScores = Nd4j.create(testDataPair.getKey().rows());
         INDArray scores = testDataPair.getKey().mmul(getWeights()); // Sj - scores for each class
-        for (int i = 0; i < scores.rows(); i++) {
-            // Syi - correct scores
-            correctScores.putScalar(i, scores.getDouble(i, testDataPair.getValue().getInt(0, i)));
-        }
-
         calculatePercentAcc(scores, testDataPair.getValue());
 
     }

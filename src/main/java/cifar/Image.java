@@ -28,9 +28,11 @@ public class Image implements ImageGeneric {
         return Nd4j.create(Util.convertToDoubleArrayBiasTrick(data));
     }
 
+
+    //remember +1 for bias trick !!!!
     @Override
     public int getDataLength() {
-        return this.data.length;
+        return this.data.length + 1;
     }
 
 
