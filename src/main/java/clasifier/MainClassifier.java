@@ -15,8 +15,10 @@ public class MainClassifier {
     public static final Logger logger = Logger.getLogger(MainClassifier.class);
 
     public static void main(String[] args) throws Exception {
-        //		ImageBinder.initializeImageBinder("/home/zaklopotany/Pulpit/images"); - linux
-        CifarImageBinder cifImgBin = new CifarImageBinder("C:\\Users\\mzukowski\\Desktop\\cifar10");
+//        		ImageBinder.initializeImageBinder("/home/zaklopotany/Pulpit/images"); - linux
+//        CifarImageBinder cifImgBin = new CifarImageBinder("C:\\Users\\mzukowski\\Desktop\\cifar10");
+        CifarImageBinder cifImgBin = new CifarImageBinder("/home/zaklopotany/Pulpit/images");
+
         List<ImageGeneric> imagesCif = cifImgBin.listOfAllImages();
         List<ImageGeneric> testImages = cifImgBin.listOfTestImages();
 
